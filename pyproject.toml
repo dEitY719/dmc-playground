@@ -7,10 +7,15 @@ build-backend = "setuptools.build_meta"
 [project]
 requires-python = ">=3.10"
 version = "0.1.0"
-name = "python-project-template"
-description = "A comprehensive project for learning and development."
+name = "dmc-playground"
+description = " A playground for practicing and experimenting with Dash Mantine Components (DMC).   Explore basic examples and various UI/UX patterns for Dash app development."
 authors = [{ name = "deitey719", email = "deity719@github.com" }]
-dependencies = ["pydantic", "PyYAML"]
+dependencies = [
+  "dash>=3.0.4",
+  "dash-mantine-components>=2.0.0",
+  "pydantic",
+  "PyYAML",
+]
 
 
 # --- mypy 타입 스터브 ---
@@ -42,7 +47,7 @@ py-modules = ["ex_module"] # TODO: 루트의 .py 파일 이름들을 여기에 �
 
 [tool.setuptools.packages.find]
 # src 디렉토리 내에서만 패키지를 찾도록 설정
-where = ["src"]
+where = ["backend", "frontend"]
 exclude = ["asset*", "config*", "tests*"] # 패키지로 인식하고 싶지 않은 디렉토리들을 명시적으로 제외 (*를 붙여 하위 디렉토리 전체를 제외)
 
 
