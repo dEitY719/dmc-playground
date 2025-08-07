@@ -1,6 +1,5 @@
 import dash
 import dash_mantine_components as dmc
-from dash import html
 
 app = dash.Dash(__name__)
 app.layout = dmc.MantineProvider(

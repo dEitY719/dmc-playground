@@ -8,13 +8,37 @@ build-backend = "setuptools.build_meta"
 requires-python = ">=3.10"
 version = "0.1.0"
 name = "dmc-playground"
-description = " A playground for practicing and experimenting with Dash Mantine Components (DMC).   Explore basic examples and various UI/UX patterns for Dash app development."
+description = "A playground for practicing and experimenting with Dash Mantine Components (DMC).   Explore basic examples and various UI/UX patterns for Dash app development."
 authors = [{ name = "deitey719", email = "deity719@github.com" }]
 dependencies = [
+  "annotated-types>=0.7.0",
+  "blinker>=1.9.0",
+  "certifi>=2025.6.15",
+  "charset-normalizer>=3.4.2",
+  "click>=8.2.1",
   "dash>=3.0.4",
   "dash-mantine-components>=2.0.0",
+  "flask>=3.0.3",
+  "idna>=3.10",
+  "importlib-metadata>=8.7.0",
+  "itsdangerous>=2.2.0",
+  "jinja2>=3.1.6",
+  "markupsafe>=3.0.2",
+  "narwhals>=1.43.1",
+  "nest-asyncio>=1.6.0",
+  "packaging>=25.0",
+  "plotly>=6.1.2",
   "pydantic",
-  "PyYAML",
+  "pydantic-core>=2.33.2",
+  "pyyaml",
+  "requests>=2.32.4",
+  "retrying>=1.3.4",
+  "setuptools>=80.9.0",
+  "typing-extensions>=4.14.0",
+  "typing-inspection>=0.4.1",
+  "urllib3>=2.5.0",
+  "werkzeug>=3.0.6",
+  "zipp>=3.23.0",
 ]
 
 
@@ -40,14 +64,12 @@ dev = [
 
 [tool.setuptools]
 # src 디렉토리를 패키지 루트로 지정하여 src/your_project_name/ 를 패키지로 인식
-# package-dir = {"" = "src"}
-# py_modules 에 루트에 있는 단일 파이썬 파일 (모듈)들을 명시적으로 추가
-py-modules = ["ex_module"] # TODO: 루트의 .py 파일 이름들을 여기에 추가
+package-dir = {"" = "src"}
 
 
 [tool.setuptools.packages.find]
 # src 디렉토리 내에서만 패키지를 찾도록 설정
-where = ["backend", "frontend"]
+where = ["src"]
 exclude = ["asset*", "config*", "tests*"] # 패키지로 인식하고 싶지 않은 디렉토리들을 명시적으로 제외 (*를 붙여 하위 디렉토리 전체를 제외)
 
 
@@ -92,6 +114,8 @@ disable = ["R", "C", "W1203"]
 files = ["./"]
 # 엄격한 타입 검사를 위한 추가 옵션들 (권장)
 strict = true # 모든 엄격 모드 활성화 (가장 강력)
+ignore_missing_imports = true
+
 # 만약 strict=true 가 너무 부담스럽다면 개별 옵션 활성화
 # no_implicit_optional = true # None을 허용하려면 명시적으로 Optional[Type] 사용
 # warn_return_any = true # Any를 반환하는 함수에 경고
@@ -102,4 +126,5 @@ strict = true # 모든 엄격 모드 활성화 (가장 강력)
 # disallow_untyped_calls = true # 타입 힌트가 없는 함수 호출에 경고
 # mypy 검사에서 제외할 디렉터리 및 파일 패턴 (정규 표현식)
 # (?x) 플래그는 정규 표현식 내에서 공백과 주석을 허용하여 가독성을 높입니다.
+
 exclude = '(?x)( \.venv/ | \.tox/ | \.vscode/ | \.git/ | build/ | config/tox/ )'
