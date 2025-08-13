@@ -1,0 +1,52 @@
+from contextlib import asynccontextmanager
+import pytest
+import pytest_asyncio
+from typing import AsyncGenerator
+from fastapi import FastAPI
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from sqlmodel import SQLModel
+
+from src.backend.main import app
+from src.backend.database import get_session
+
+# Use an async SQLite database for testing
+DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+engine = create_async_engine(DATABASE_URL, echo=True)
+async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+
+@asynccontextmanager
+async def test_lifespan(app: FastAPI):
+    """
+    Test lifespan manager to create and drop database tables.
+    """
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
+    yield
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.drop_all)
+
+
+app.router.lifespan_context = test_lifespan
+
+
+async def override_get_session() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Dependency override to provide a test database session.
+    """
+    async with async_session_maker() as session:
+        yield session
+
+
+app.dependency_overrides[get_session] = override_get_session
+
+
+@pytest_asyncio.fixture(name="client")
+async def client_fixture() -> AsyncGenerator[AsyncClient, None]:
+    """
+    Create an AsyncClient for the FastAPI app.
+    """
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        yield client

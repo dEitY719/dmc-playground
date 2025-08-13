@@ -11,39 +11,28 @@ name = "dmc-playground"
 description = "A playground for practicing and experimenting with Dash Mantine Components (DMC).   Explore basic examples and various UI/UX patterns for Dash app development."
 authors = [{ name = "deitey719", email = "deity719@github.com" }]
 dependencies = [
-  "annotated-types>=0.7.0",
-  "blinker>=1.9.0",
-  "certifi>=2025.6.15",
-  "charset-normalizer>=3.4.2",
-  "click>=8.2.1",
-  "dash>=3.0.4",
-  "dash-mantine-components>=2.0.0",
-  "flask>=3.0.3",
-  "idna>=3.10",
-  "importlib-metadata>=8.7.0",
-  "itsdangerous>=2.2.0",
-  "jinja2>=3.1.6",
-  "markupsafe>=3.0.2",
-  "narwhals>=1.43.1",
-  "nest-asyncio>=1.6.0",
-  "packaging>=25.0",
-  "plotly>=6.1.2",
   "pydantic",
-  "pydantic-core>=2.33.2",
-  "pyyaml",
-  "requests>=2.32.4",
-  "retrying>=1.3.4",
-  "setuptools>=80.9.0",
-  "typing-extensions>=4.14.0",
-  "typing-inspection>=0.4.1",
-  "urllib3>=2.5.0",
-  "werkzeug>=3.0.6",
-  "zipp>=3.23.0",
+  "requests",
 ]
 
 
 # --- mypy 타입 스터브 ---
 [project.optional-dependencies]
+frontend = [
+  "dash>=3.0.4",
+  "dash-mantine-components>=2.0.0",
+  "plotly>=6.1.2",
+]
+backend = [
+  "fastapi",
+  "uvicorn[standard]",
+  "sqlmodel",
+  "psycopg2-binary",
+]
+all = [
+  "dmc-playground[frontend]",
+  "dmc-playground[backend]",
+]
 dev = [
   "tox",
   # 코드 품질 및 포맷팅
@@ -55,6 +44,8 @@ dev = [
   # 테스트 관련
   "pytest",
   "pytest-mock",
+  "httpx",
+  "pydantic-settings",
   # mypy 타입 스터브 (types-*)
   "types-toml",
   "types-requests",
