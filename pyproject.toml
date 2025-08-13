@@ -17,44 +17,41 @@ dependencies = [
 ]
 
 
-# --- mypy 타입 스터브 ---
 [project.optional-dependencies]
 frontend = [
   "dash>=3.0.4",
   "dash-mantine-components>=2.0.0",
   "plotly>=6.1.2",
 ]
+
 backend = [
-  "fastapi",
+  "fastapi>=0.116.1",
   "uvicorn[standard]",
-  "sqlmodel",
+  "sqlmodel>=0.0.24",
   "psycopg2-binary",
+  "sqlalchemy>=2.0.43",
+  "aiosqlite>=0.21.0",
+  "asyncpg>=0.30.0",
+  "httpx>=0.28.1",
 ]
+
 all = [
-  # frontend 의존성
-  "dash>=3.0.4",
-  "dash-mantine-components>=2.0.0",
-  "plotly>=6.1.2",
-  # backend 의존성
-  "fastapi",
-  "uvicorn[standard]",
-  "sqlmodel",
-  "psycopg2-binary",
+  # frontend + backend를 합치되, 중복 패키지는 생략
+  "frontend",
+  "backend",
 ]
+
 dev = [
   "tox",
-  # 코드 품질 및 포맷팅
   "black",
   "isort",
   "mypy",
   "pylint",
   "pylint-exit",
-  # 테스트 관련
   "pytest",
   "pytest-mock",
   "httpx",
   "pydantic-settings",
-  # mypy 타입 스터브 (types-*), sqlalchemy-stubs 제거
   "types-toml",
   "types-requests",
   "types-PyYAML",
