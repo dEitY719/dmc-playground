@@ -19,7 +19,7 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-async def create_db_and_tables():
+async def create_db_and_tables() -> None:  # Added return type
     """
     Utility function to create all database tables defined by SQLModel models.
     This should be called once when the application starts.

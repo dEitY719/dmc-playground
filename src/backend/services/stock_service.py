@@ -1,5 +1,4 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
 
 from src.backend.models.stock import Stock
 

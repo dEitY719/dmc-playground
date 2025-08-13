@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from typing import AsyncGenerator  # Added for lifespan return type
 
 from fastapi import FastAPI
 
@@ -7,7 +8,7 @@ from src.backend.database import create_db_and_tables
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # Added return type
     """
     Lifespan manager for the application.
     Creates database tables on startup.
@@ -16,7 +17,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(
+fastapi_app = FastAPI(  # Renamed app to fastapi_app
     title="Stock Playground API",
     description="API for a toy project to manage stock information.",
     version="0.1.0",
@@ -24,11 +25,11 @@ app = FastAPI(
 )
 
 # Include the API router from stock_api.py
-app.include_router(stock_api.router, tags=["Stocks"])
+fastapi_app.include_router(stock_api.router, tags=["Stocks"])  # Used fastapi_app
 
 
-@app.get("/", tags=["Root"])
-def read_root():
+@fastapi_app.get("/", tags=["Root"])  # Used fastapi_app
+def read_root() -> dict[str, str]:  # Added return type
     """
     Root endpoint to check if the API is running.
     """
