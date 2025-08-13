@@ -1,15 +1,16 @@
 from contextlib import asynccontextmanager
+from typing import AsyncGenerator
+
 import pytest
 import pytest_asyncio
-from typing import AsyncGenerator
 from fastapi import FastAPI
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
 
-from src.backend.main import app
 from src.backend.database import get_session
+from src.backend.main import app
 
 # Use an async SQLite database for testing
 DATABASE_URL = "sqlite+aiosqlite:///:memory:"

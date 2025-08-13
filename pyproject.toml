@@ -12,6 +12,7 @@ description = "A playground for practicing and experimenting with Dash Mantine C
 authors = [{ name = "deitey719", email = "deity719@github.com" }]
 dependencies = [
   "pydantic",
+  "pytest-asyncio>=1.1.0",
   "requests",
 ]
 
@@ -104,6 +105,8 @@ disable = ["R", "C", "W1203"]
 [tool.mypy]
 mypy_path = "typings"
 files = ["./"]
+namespace_packages = true
+package_dir = {"" = "src"}
 # 엄격한 타입 검사를 위한 추가 옵션들 (권장)
 strict = true # 모든 엄격 모드 활성화 (가장 강력)
 ignore_missing_imports = true
@@ -119,4 +122,4 @@ ignore_missing_imports = true
 # mypy 검사에서 제외할 디렉터리 및 파일 패턴 (정규 표현식)
 # (?x) 플래그는 정규 표현식 내에서 공백과 주석을 허용하여 가독성을 높입니다.
 
-exclude = '(?x)( \.venv/ | \.tox/ | \.vscode/ | \.git/ | build/ | config/tox/ )'
+exclude = '(?:\.venv/|\.tox/|\.vscode/|\.git/|build/|config/tox/|src/frontend/config/)'

@@ -1,5 +1,6 @@
-from dash.development.base_component import Component
 from typing import Any
+
+from dash.development.base_component import Component
 
 def Text(*args: Any, **kwargs: Any) -> Component: ...
 def Alert(*args: Any, **kwargs: Any) -> Component: ...
