@@ -3,13 +3,13 @@ from typing import AsyncGenerator
 
 import pytest_asyncio
 from fastapi import FastAPI
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
 
 from src.backend.database import get_session
-from src.backend.main import app as fastapi_app  # Renamed app to fastapi_app
+from src.backend.main import fastapi_app
 
 # Use an async SQLite database for testing
 DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -29,7 +29,7 @@ async def test_lifespan(app: FastAPI):
         await conn.run_sync(SQLModel.metadata.drop_all)
 
 
-fastapi_app.router.lifespan_context = test_lifespan  # Used fastapi_app
+fastapi_app.router.lifespan_context = test_lifespan
 
 
 async def override_get_session() -> AsyncGenerator[AsyncSession, None]:
@@ -40,7 +40,7 @@ async def override_get_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-fastapi_app.dependency_overrides[get_session] = override_get_session  # Used fastapi_app
+fastapi_app.dependency_overrides[get_session] = override_get_session
 
 
 @pytest_asyncio.fixture(name="client")
@@ -48,5 +48,6 @@ async def client_fixture() -> AsyncGenerator[AsyncClient, None]:
     """
     Create an AsyncClient for the FastAPI app.
     """
-    async with AsyncClient(app=fastapi_app, base_url="http://test") as client:
+    transport = ASGITransport(app=fastapi_app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client

@@ -31,8 +31,15 @@ backend = [
   "psycopg2-binary",
 ]
 all = [
-  "dmc-playground[frontend]",
-  "dmc-playground[backend]",
+  # frontend 의존성
+  "dash>=3.0.4",
+  "dash-mantine-components>=2.0.0",
+  "plotly>=6.1.2",
+  # backend 의존성
+  "fastapi",
+  "uvicorn[standard]",
+  "sqlmodel",
+  "psycopg2-binary",
 ]
 dev = [
   "tox",
@@ -47,11 +54,10 @@ dev = [
   "pytest-mock",
   "httpx",
   "pydantic-settings",
-  # mypy 타입 스터브 (types-*)
+  # mypy 타입 스터브 (types-*), sqlalchemy-stubs 제거
   "types-toml",
   "types-requests",
   "types-PyYAML",
-  "sqlalchemy-stubs",
   "pydantic-extra-types",
 ]
 
