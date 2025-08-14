@@ -1,7 +1,9 @@
-from fastapi.testclient import TestClient
+import pytest
+from httpx import AsyncClient
 
 
-def test_create_stock(client: TestClient):
+@pytest.mark.asyncio
+async def test_create_stock(client: AsyncClient):
     """
     Test case for creating a new stock entry.
     """
@@ -19,7 +21,7 @@ def test_create_stock(client: TestClient):
     }
 
     # 2. Send a POST request to the endpoint
-    response = client.post("/stocks/", json=stock_data)
+    response = await client.post("/stocks/", json=stock_data)
 
     # 3. Assert the response
     assert response.status_code == 200

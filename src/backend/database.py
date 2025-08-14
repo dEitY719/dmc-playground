@@ -9,8 +9,14 @@ from sqlalchemy.ext.asyncio import (
 from sqlmodel import SQLModel
 
 from src.backend.config import settings
+from src.backend.models.stock import Stock  # Stock 모델 임포트
 
-engine: AsyncEngine = create_async_engine(settings.DATABASE_URL, echo=True)
+# ✅ pytest 실행 여부에 따라 DATABASE_URL 또는 TEST_DATABASE_URL 사용
+engine: AsyncEngine = create_async_engine(
+    settings.EFFECTIVE_DATABASE_URL,
+    echo=True,
+    pool_pre_ping=True,  # 연결 확인 옵션 추가
+)
 
 async_session_maker = async_sessionmaker(
     bind=engine,
@@ -27,7 +33,7 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-async def create_db_and_tables() -> None:  # Added return type
+async def create_db_and_tables() -> None:
     """
     Utility function to create all database tables defined by SQLModel models.
     This should be called once when the application starts.
