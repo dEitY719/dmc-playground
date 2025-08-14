@@ -9,7 +9,6 @@ from sqlalchemy.ext.asyncio import (
 from sqlmodel import SQLModel
 
 from src.backend.config import settings
-from src.backend.models.stock import Stock  # Stock 모델 임포트
 
 # ✅ pytest 실행 여부에 따라 DATABASE_URL 또는 TEST_DATABASE_URL 사용
 engine: AsyncEngine = create_async_engine(

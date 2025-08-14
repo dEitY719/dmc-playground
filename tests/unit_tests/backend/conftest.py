@@ -10,7 +10,6 @@ from sqlmodel import SQLModel
 from src.backend.config import settings
 from src.backend.database import get_session
 from src.backend.main import fastapi_app
-from src.backend.models.stock import Stock  # Stock 모델 임포트
 
 # ✅ PostgreSQL 테스트 DB 엔진 생성
 engine = create_async_engine(
