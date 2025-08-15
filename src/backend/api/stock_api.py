@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.backend.database import get_session
+from src.backend.database import get_db
 from src.backend.models.stock import Stock, StockUpdate
 from src.backend.services import stock_service
 
@@ -11,7 +11,7 @@ router = APIRouter()
 @router.post("/stocks/", response_model=Stock)
 async def create_stock(
     *,
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_db),
     stock: Stock,
 ) -> Stock:
     """
@@ -23,7 +23,7 @@ async def create_stock(
 @router.get("/stocks/{stock_id}", response_model=Stock)
 async def read_stock(
     *,
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_db),
     stock_id: int,
 ) -> Stock:
     """
@@ -38,7 +38,7 @@ async def read_stock(
 @router.put("/stocks/{stock_id}", response_model=Stock)
 async def update_stock(
     *,
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_db),
     stock_id: int,
     stock_update: StockUpdate,
 ) -> Stock:
@@ -54,7 +54,7 @@ async def update_stock(
 @router.delete("/stocks/{stock_id}")
 async def delete_stock(
     *,
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_db),
     stock_id: int,
 ) -> dict[str, str]:
     """
