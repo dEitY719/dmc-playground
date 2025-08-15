@@ -1,11 +1,11 @@
 import pytest
 import pytest_asyncio
 from sqlalchemy import inspect
-from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.types import DateTime, String
 from sqlmodel import SQLModel
 
-from src.backend.database import init_db
+from src.backend.database import get_db, init_db
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -92,7 +92,7 @@ async def test_init_db_creates_tables(engine_for_init_db_test: AsyncEngine):
 
 
 @pytest.mark.asyncio
-async def test_init_db_check_column_type(engine_for_init_db_test: AsyncEngine):
+async def test_init_db_check_column_type(engine_for_init_db_test: AsyncEngine) -> None:
     """
     init_db 함수가 생성한 테이블의 특정 컬럼 타입이 올바른지 테스트합니다.
     """
@@ -115,3 +115,15 @@ async def test_init_db_check_column_type(engine_for_init_db_test: AsyncEngine):
         created_at_column = next((col for col in columns if col["name"] == "created_at"), None)
         assert created_at_column is not None
         assert isinstance(created_at_column["type"], DateTime)
+
+
+@pytest.mark.asyncio
+async def test_get_db_yields_async_session(get_test_db_session: AsyncSession) -> None:
+    """
+    get_db 함수가 AsyncSession 인스턴스를 올바르게 반환하는지 테스트합니다.
+    """
+    async for session in get_db():
+        assert isinstance(session, AsyncSession)
+        # 추가적으로 세션이 활성 상태인지 확인할 수 있지만, 이는 SQLAlchemy의 내부 동작에 더 가깝습니다.
+        # 예를 들어, 세션에 쿼리를 시도하여 유효성을 확인할 수 있습니다.
+        break  # 제너레이터는 한 번만 yield하므로 break
