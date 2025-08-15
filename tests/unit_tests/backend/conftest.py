@@ -2,6 +2,7 @@ import pytest_asyncio
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
 from sqlmodel import SQLModel
 
 from src.backend.config import settings
@@ -14,7 +15,7 @@ async def create_test_engine_fixture():
     """
     테스트용 비동기 SQLAlchemy 엔진을 생성하고 세션 동안 유지합니다.
     """
-    engine = create_async_engine(settings.EFFECTIVE_DATABASE_URL, echo=False)
+    engine = create_async_engine(settings.EFFECTIVE_DATABASE_URL, echo=False, poolclass=NullPool)
     yield engine
     await engine.dispose()
 
