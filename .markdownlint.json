@@ -1,5 +1,6 @@
 {
     "default": true,
-    "MD013": false,       // disable line length rule if you want
-    "MD041": false        // disable first line heading rule
+    "MD013": false,     // disable line length rule if you want
+    "MD041": false,     // disable first line heading rule
+    "MD046": false      // Allow fenced, code-block-style Code block style [Expected: indented; Actual: fenced]
 }

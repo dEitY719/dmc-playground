@@ -1,5 +1,5 @@
+from collections.abc import AsyncGenerator  # Added for lifespan return type
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator  # Added for lifespan return type
 
 from fastapi import FastAPI
 

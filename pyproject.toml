@@ -43,6 +43,7 @@ all = [
 
 dev = [
   "tox",
+  "ruff",
   "black",
   "isort",
   "mypy",
@@ -133,3 +134,26 @@ ignore_missing_imports = true
 # (?x) 플래그는 정규 표현식 내에서 공백과 주석을 허용하여 가독성을 높입니다.
 
 exclude = '(?:\.venv/|\.tox/|\.vscode/|\.git/|build/|config/tox/|src/frontend/config/)'
+
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+exclude = [".git", ".mypy_cache", ".tox", ".nox", ".venv", "build", "dist", ".vscode"]
+
+
+[tool.ruff.lint]
+# E, F: pyflakes/pycodestyle 기본 규칙
+# W: 경고
+# I: isort (import 정렬)
+# UP: pyupgrade (최신 파이썬 문법 자동 변환)
+select = ["E", "F", "W", "I", "UP"]
+
+# pylint의 W1203 (logging-fstring-interpolation)에 해당하는 ruff 규칙(G004) 비활성화
+ignore = ["G004"]
+  
+
+[tool.ruff.format]
+# black과 호환되는 포맷팅 설정
+quote-style = "double"
+# skip-string-normalization = false
