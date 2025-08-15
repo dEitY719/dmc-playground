@@ -19,7 +19,7 @@ async def test_update_stock(client: AsyncClient):
         "close": 304.0,
         "volume": 700000,
     }
-    create_response = await client.post("/stocks/", json=stock_data)
+    create_response = await client.post("/robot/stocks/", json=stock_data)
     assert create_response.status_code == 200
     created_stock = create_response.json()
     stock_id = created_stock["id"]
@@ -28,7 +28,7 @@ async def test_update_stock(client: AsyncClient):
     updated_data = {"close": 306.5, "volume": 750000}
 
     # 3. Send a PUT request to the endpoint
-    response = await client.put(f"/stocks/{stock_id}", json=updated_data)
+    response = await client.put(f"/robot/stocks/{stock_id}", json=updated_data)
 
     # 4. Assert the response
     assert response.status_code == 200

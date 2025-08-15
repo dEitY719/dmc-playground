@@ -21,7 +21,7 @@ async def test_create_stock(client: AsyncClient):
     }
 
     # 2. Send a POST request to the endpoint
-    response = await client.post("/stocks/", json=stock_data)
+    response = await client.post("/robot/stocks/", json=stock_data)
 
     # 3. Assert the response
     assert response.status_code == 200

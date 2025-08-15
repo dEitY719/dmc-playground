@@ -19,13 +19,13 @@ async def test_delete_stock(client: AsyncClient):
         "close": 508.0,
         "volume": 1200000,
     }
-    create_response = await client.post("/stocks/", json=stock_data)
+    create_response = await client.post("/robot/stocks/", json=stock_data)
     assert create_response.status_code == 200
     created_stock = create_response.json()
     stock_id = created_stock["id"]
 
     # 2. Send a DELETE request to the endpoint
-    delete_response = await client.delete(f"/stocks/{stock_id}")
+    delete_response = await client.delete(f"/robot/stocks/{stock_id}")
     assert delete_response.status_code == 200
     assert delete_response.json() == {"message": "Stock deleted successfully"}
 

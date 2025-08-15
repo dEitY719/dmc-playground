@@ -19,13 +19,13 @@ async def test_read_stock(client: AsyncClient):
         "close": 2805.0,
         "volume": 500000,
     }
-    create_response = await client.post("/stocks/", json=stock_data)
+    create_response = await client.post("/robot/stocks/", json=stock_data)
     assert create_response.status_code == 200
     created_stock = create_response.json()
     stock_id = created_stock["id"]
 
     # 2. Send a GET request to the endpoint
-    response = await client.get(f"/stocks/{stock_id}")
+    response = await client.get(f"/robot/stocks/{stock_id}")
 
     # 3. Assert the response
     assert response.status_code == 200
