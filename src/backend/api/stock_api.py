@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.backend.database import get_session
@@ -18,3 +18,18 @@ async def create_stock(
     Create a new stock entry.
     """
     return await stock_service.create_stock(session=session, stock=stock)
+
+
+@router.get("/stocks/{stock_id}", response_model=Stock)
+async def read_stock(
+    *,
+    session: AsyncSession = Depends(get_session),
+    stock_id: int,
+) -> Stock:
+    """
+    Get a stock by ID.
+    """
+    db_stock = await stock_service.get_stock(session=session, stock_id=stock_id)
+    if not db_stock:
+        raise HTTPException(status_code=404, detail="Stock not found")
+    return db_stock
