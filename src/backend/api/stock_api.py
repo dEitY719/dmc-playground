@@ -45,9 +45,7 @@ async def update_stock(
     """
     Update a stock by ID.
     """
-    db_stock = await stock_service.update_stock(
-        session=session, stock_id=stock_id, stock_update=stock_update
-    )
+    db_stock = await stock_service.update_stock(session=session, stock_id=stock_id, stock_update=stock_update)
     if not db_stock:
         raise HTTPException(status_code=404, detail="Stock not found")
     return db_stock
