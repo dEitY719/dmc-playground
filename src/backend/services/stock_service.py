@@ -45,3 +45,17 @@ async def update_stock(*, session: AsyncSession, stock_id: int, stock_update: St
     await session.commit()
     await session.refresh(db_stock)
     return db_stock
+
+
+async def delete_stock(*, session: AsyncSession, stock_id: int) -> bool:
+    """
+    Deletes a stock entry from the database.
+    Returns True if deletion was successful, False otherwise.
+    """
+    db_stock = await get_stock(session=session, stock_id=stock_id)
+    if not db_stock:
+        return False
+
+    await session.delete(db_stock)
+    await session.commit()
+    return True

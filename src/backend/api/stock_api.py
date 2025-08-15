@@ -49,3 +49,18 @@ async def update_stock(
     if not db_stock:
         raise HTTPException(status_code=404, detail="Stock not found")
     return db_stock
+
+
+@router.delete("/stocks/{stock_id}")
+async def delete_stock(
+    *,
+    session: AsyncSession = Depends(get_session),
+    stock_id: int,
+) -> dict[str, str]:
+    """
+    Delete a stock by ID.
+    """
+    success = await stock_service.delete_stock(session=session, stock_id=stock_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Stock not found")
+    return {"message": "Stock deleted successfully"}
