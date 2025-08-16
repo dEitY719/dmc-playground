@@ -25,6 +25,14 @@ async def get_stock(*, session: AsyncSession, stock_id: int) -> Stock | None:
     return result.scalar_one_or_none()
 
 
+async def get_all_stocks(*, session: AsyncSession) -> list[Stock]:
+    """
+    Retrieves all stock entries from the database.
+    """
+    result = await session.execute(select(Stock))
+    return list(result.scalars().all())
+
+
 async def update_stock(*, session: AsyncSession, stock_id: int, stock_update: StockUpdate) -> Stock | None:
     """
     Updates an existing stock entry in the database.
@@ -59,3 +67,18 @@ async def delete_stock(*, session: AsyncSession, stock_id: int) -> bool:
     await session.delete(db_stock)
     await session.commit()
     return True
+
+
+async def delete_all_stocks(*, session: AsyncSession) -> int:
+    """
+    Deletes all stock entries from the database.
+    Returns the number of deleted rows.
+    """
+    result = await session.execute(select(Stock))
+    stocks_to_delete = result.scalars().all()
+    deleted_count = 0
+    for stock in stocks_to_delete:
+        await session.delete(stock)
+        deleted_count += 1
+    await session.commit()
+    return deleted_count

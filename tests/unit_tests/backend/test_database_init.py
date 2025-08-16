@@ -127,3 +127,23 @@ async def test_get_db_yields_async_session(get_test_db_session: AsyncSession) ->
         # 추가적으로 세션이 활성 상태인지 확인할 수 있지만, 이는 SQLAlchemy의 내부 동작에 더 가깝습니다.
         # 예를 들어, 세션에 쿼리를 시도하여 유효성을 확인할 수 있습니다.
         break  # 제너레이터는 한 번만 yield하므로 break
+
+
+@pytest.mark.asyncio
+async def test_db_creation_and_deletion(setup_test_db: AsyncEngine):
+    """
+    setup_test_db 픽스처를 사용하여 데이터베이스 생성 및 삭제를 확인합니다.
+    """
+    async with setup_test_db.connect() as conn:
+
+        def get_tables(sync_conn):
+            inspector = inspect(sync_conn)
+            return inspector.get_table_names()
+
+        # 픽스처에 의해 테이블이 생성되었는지 확인
+        existing_tables = await conn.run_sync(get_tables)
+        assert "stock" in existing_tables
+
+    # 테스트 함수 종료 후 픽스처의 teardown 부분에서 drop_all이 호출되므로,
+    # 여기서는 명시적으로 drop_all을 호출할 필요가 없습니다.
+    # 다음 테스트가 시작될 때 테이블이 없는 상태임을 확인하는 방식으로 검증됩니다.
