@@ -62,6 +62,18 @@ async def update_stock(
     return db_stock
 
 
+@stockbot_router.delete("/stocks/all")
+async def delete_all_stocks(
+    *,
+    session: AsyncSession = Depends(get_db),
+) -> dict[str, str]:
+    """
+    Delete all stock entries.
+    """
+    deleted_count = await stock_service.delete_all_stocks(session=session)
+    return {"message": f"Successfully deleted {deleted_count} stocks"}
+
+
 @stockbot_router.delete("/stocks/{stock_id}")
 async def delete_stock(
     *,
@@ -75,15 +87,3 @@ async def delete_stock(
     if not success:
         raise HTTPException(status_code=404, detail="Stock not found")
     return {"message": "Stock deleted successfully"}
-
-
-@stockbot_router.delete("/stocks/all")
-async def delete_all_stocks(
-    *,
-    session: AsyncSession = Depends(get_db),
-) -> dict[str, str]:
-    """
-    Delete all stock entries.
-    """
-    deleted_count = await stock_service.delete_all_stocks(session=session)
-    return {"message": f"Successfully deleted {deleted_count} stocks"}

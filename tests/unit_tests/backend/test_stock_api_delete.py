@@ -83,3 +83,54 @@ async def test_delete_all_stocks(client: AsyncClient):
     get_all_response_after_delete = await client.get("/robot/stocks/")
     assert get_all_response_after_delete.status_code == 200
     assert len(get_all_response_after_delete.json()) == 0
+
+
+@pytest.mark.asyncio
+async def test_delete_all_stocks_force(client: AsyncClient):
+    """
+    스크립트 성격의 함수: 현재 DB에 등록된 모든 주식을 읽고 강제로 모두 삭제합니다.
+    """
+    print("\n--- 모든 주식 강제 삭제 시작 ---")
+
+    # 1. 현재 DB에 등록된 모든 주식 읽기
+    get_all_response = await client.get("/robot/stocks/")
+    if get_all_response.status_code == 200:
+        stocks = get_all_response.json()
+        print(f"현재 DB에 {len(stocks)}개의 주식이 등록되어 있습니다.")
+        if stocks:
+            for stock in stocks:
+                print(f"  - ID: {stock.get('id')}, Ticker: {stock.get('ticker')}")
+        else:
+            print("등록된 주식이 없습니다.")
+    else:
+        print(
+            "모든 주식을 가져오는 데 실패했습니다. "
+            f"상태 코드: {get_all_response.status_code}, "
+            f"응답: {get_all_response.text}"
+        )
+        return
+
+    # 2. 강제로 모두 삭제
+    delete_all_response = await client.delete("/robot/stocks/all")
+    if delete_all_response.status_code == 200:
+        print(f"모든 주식이 성공적으로 삭제되었습니다. 응답: {delete_all_response.json()}")
+    else:
+        print(
+            "모든 주식을 삭제하는 데 실패했습니다. "
+            f"상태 코드: {delete_all_response.status_code}, "
+            f"응답: {delete_all_response.text}"
+        )
+
+    # 3. 삭제 후 다시 확인
+    get_all_response_after_delete = await client.get("/robot/stocks/")
+    if get_all_response_after_delete.status_code == 200:
+        remaining_stocks = get_all_response_after_delete.json()
+        print(f"삭제 후 DB에 {len(remaining_stocks)}개의 주식이 남아 있습니다.")
+    else:
+        print(
+            "삭제 후 주식 확인에 실패했습니다. "
+            f"상태 코드: {get_all_response_after_delete.status_code}, "
+            f"응답: {get_all_response_after_delete.text}"
+        )
+
+    print("--- 모든 주식 강제 삭제 완료 ---")
