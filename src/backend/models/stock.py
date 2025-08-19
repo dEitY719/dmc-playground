@@ -12,13 +12,34 @@ class StockBase(SQLModel):
     name: str | None = Field(default=None, index=True)
     market: str | None = Field(default=None, index=True)
     currency: str | None = Field(default="USD")
-    time: datetime = Field(index=True)
+    time: datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False, index=True))
     open: float
     high: float
     low: float
     close: float
+    previous_close: float | None = Field(default=None)
+    change: float | None = Field(default=None)
+    change_percent: float | None = Field(default=None)
     adjusted_close: float | None = Field(default=None)
     volume: int
+
+
+class StockCreate(StockBase):
+    """
+    Model for creating a new stock entry.
+    """
+
+    pass
+
+
+class StockRead(StockBase):
+    """
+    Model for reading stock data from the API.
+    """
+
+    id: int
+    created_at: datetime
+    updated_at: datetime
 
 
 class Stock(StockBase, table=True):

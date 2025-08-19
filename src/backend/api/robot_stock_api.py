@@ -2,30 +2,30 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.backend.database import get_db
-from src.backend.models.stock import Stock, StockUpdate
+from src.backend.models.stock import StockCreate, StockRead, StockUpdate
 from src.backend.services import stock_service
 
 stockbot_router = APIRouter(tags=["StockBot_API"])
 
 
-@stockbot_router.post("/stocks/", response_model=Stock)
+@stockbot_router.post("/stocks/", response_model=StockRead)
 async def create_stock(
     *,
     session: AsyncSession = Depends(get_db),
-    stock: Stock,
-) -> Stock:
+    stock: StockCreate,
+) -> StockRead:
     """
     Create a new stock entry.
     """
     return await stock_service.create_stock(session=session, stock=stock)
 
 
-@stockbot_router.get("/stocks/{stock_id}", response_model=Stock)
+@stockbot_router.get("/stocks/{stock_id}", response_model=StockRead)
 async def read_stock(
     *,
     session: AsyncSession = Depends(get_db),
     stock_id: int,
-) -> Stock:
+) -> StockRead:
     """
     Get a stock by ID.
     """
@@ -35,24 +35,24 @@ async def read_stock(
     return db_stock
 
 
-@stockbot_router.get("/stocks/", response_model=list[Stock])
+@stockbot_router.get("/stocks/", response_model=list[StockRead])
 async def read_all_stocks(
     *,
     session: AsyncSession = Depends(get_db),
-) -> list[Stock]:
+) -> list[StockRead]:
     """
     Get all stock entries.
     """
     return await stock_service.get_all_stocks(session=session)
 
 
-@stockbot_router.put("/stocks/{stock_id}", response_model=Stock)
+@stockbot_router.put("/stocks/{stock_id}", response_model=StockRead)
 async def update_stock(
     *,
     session: AsyncSession = Depends(get_db),
     stock_id: int,
     stock_update: StockUpdate,
-) -> Stock:
+) -> StockRead:
     """
     Update a stock by ID.
     """
@@ -62,7 +62,7 @@ async def update_stock(
     return db_stock
 
 
-@stockbot_router.delete("/stocks/all")
+@stockbot_router.delete("/stocks/all", response_model=dict)
 async def delete_all_stocks(
     *,
     session: AsyncSession = Depends(get_db),
@@ -74,7 +74,7 @@ async def delete_all_stocks(
     return {"message": f"Successfully deleted {deleted_count} stocks"}
 
 
-@stockbot_router.delete("/stocks/{stock_id}")
+@stockbot_router.delete("/stocks/{stock_id}", response_model=dict)
 async def delete_stock(
     *,
     session: AsyncSession = Depends(get_db),

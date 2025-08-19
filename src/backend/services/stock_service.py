@@ -3,10 +3,10 @@ from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
-from src.backend.models.stock import Stock, StockUpdate
+from src.backend.models.stock import Stock, StockCreate, StockRead, StockUpdate
 
 
-async def create_stock(*, session: AsyncSession, stock: Stock) -> Stock:
+async def create_stock(*, session: AsyncSession, stock: StockCreate) -> StockRead:
     """
     Creates a new stock entry in the database.
     """
@@ -14,30 +14,36 @@ async def create_stock(*, session: AsyncSession, stock: Stock) -> Stock:
     session.add(db_stock)
     await session.commit()
     await session.refresh(db_stock)
-    return db_stock
+    return StockRead.model_validate(db_stock)
 
 
-async def get_stock(*, session: AsyncSession, stock_id: int) -> Stock | None:
+async def get_stock(*, session: AsyncSession, stock_id: int) -> StockRead | None:
     """
     Retrieves a stock entry by its ID.
     """
     result = await session.execute(select(Stock).where(Stock.id == stock_id))
-    return result.scalar_one_or_none()
+    db_stock = result.scalar_one_or_none()
+    if db_stock:
+        return StockRead.model_validate(db_stock)
+    return None
 
 
-async def get_all_stocks(*, session: AsyncSession) -> list[Stock]:
+async def get_all_stocks(*, session: AsyncSession) -> list[StockRead]:
     """
     Retrieves all stock entries from the database.
     """
     result = await session.execute(select(Stock))
-    return list(result.scalars().all())
+    return [StockRead.model_validate(stock) for stock in result.scalars().all()]
 
 
-async def update_stock(*, session: AsyncSession, stock_id: int, stock_update: StockUpdate) -> Stock | None:
+async def update_stock(*, session: AsyncSession, stock_id: int, stock_update: StockUpdate) -> StockRead | None:
     """
     Updates an existing stock entry in the database.
     """
-    db_stock = await get_stock(session=session, stock_id=stock_id)
+    # Retrieve the actual Stock object from the database
+    result = await session.execute(select(Stock).where(Stock.id == stock_id))
+    db_stock = result.scalar_one_or_none()
+
     if not db_stock:
         return None
 
@@ -52,7 +58,7 @@ async def update_stock(*, session: AsyncSession, stock_id: int, stock_update: St
     session.add(db_stock)
     await session.commit()
     await session.refresh(db_stock)
-    return db_stock
+    return StockRead.model_validate(db_stock)
 
 
 async def delete_stock(*, session: AsyncSession, stock_id: int) -> bool:

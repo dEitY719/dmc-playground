@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 from src.backend.__version__ import __version__
 from src.backend.api.robot_stock_api import stockbot_router
-from src.backend.api.stock_api import frontend_router
+from src.backend.api.stock_api import router as stock_router
 from src.backend.database import init_db
 
 
@@ -28,7 +28,7 @@ app = FastAPI(  # Renamed app to fastapi_app
 
 # Include the API router from stock_api.py
 app.include_router(stockbot_router, prefix="/robot")
-app.include_router(frontend_router, prefix="/frontend")
+app.include_router(stock_router)
 
 
 @app.get("/", tags=["Root"])  # Used fastapi_app
