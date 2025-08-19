@@ -17,15 +17,12 @@ async def create_stock(*, session: AsyncSession, stock: StockCreate) -> StockRea
     return StockRead.model_validate(db_stock)
 
 
-async def get_stock(*, session: AsyncSession, stock_id: int) -> StockRead | None:
+async def get_stock(*, session: AsyncSession, stock_id: int) -> Stock | None:
     """
     Retrieves a stock entry by its ID.
     """
     result = await session.execute(select(Stock).where(Stock.id == stock_id))
-    db_stock = result.scalar_one_or_none()
-    if db_stock:
-        return StockRead.model_validate(db_stock)
-    return None
+    return result.scalar_one_or_none()
 
 
 async def get_all_stocks(*, session: AsyncSession) -> list[StockRead]:

@@ -18,7 +18,7 @@ async def read_stock(stock_id: int, db: AsyncSession = Depends(get_db)) -> Stock
     db_stock = await stock_service.get_stock(session=db, stock_id=stock_id)
     if db_stock is None:
         raise HTTPException(status_code=404, detail="Stock not found")
-    return db_stock
+    return StockRead.model_validate(db_stock)
 
 
 @router.get("/", response_model=list[StockRead])

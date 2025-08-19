@@ -87,6 +87,9 @@ async def test_init_db_creates_tables(engine_for_init_db_test: AsyncEngine):
             "volume",
             "created_at",
             "updated_at",
+            "change_percent",
+            "previous_close",
+            "change",
         }
         assert expected_columns == column_names
 

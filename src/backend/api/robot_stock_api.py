@@ -32,7 +32,7 @@ async def read_stock(
     db_stock = await stock_service.get_stock(session=session, stock_id=stock_id)
     if not db_stock:
         raise HTTPException(status_code=404, detail="Stock not found")
-    return db_stock
+    return StockRead.model_validate(db_stock)
 
 
 @stockbot_router.get("/stocks/", response_model=list[StockRead])
@@ -59,7 +59,7 @@ async def update_stock(
     db_stock = await stock_service.update_stock(session=session, stock_id=stock_id, stock_update=stock_update)
     if not db_stock:
         raise HTTPException(status_code=404, detail="Stock not found")
-    return db_stock
+    return StockRead.model_validate(db_stock)
 
 
 @stockbot_router.delete("/stocks/all", response_model=dict)
