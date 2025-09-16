@@ -1,5 +1,5 @@
+
 import pandas as pd
-from datetime import datetime
 
 from src.backend.services.yf_adapter import df_to_stockbase
 
@@ -17,7 +17,9 @@ def test_df_to_stockbase_simple_dataframe():
         index=dates,
     )
 
-    records = df_to_stockbase(df, ticker="TEST", name="Test Co", market="TESTX", currency="USD", auto_adjust=True, timezone="UTC")
+    records = df_to_stockbase(
+        df, ticker="TEST", name="Test Co", market="TESTX", currency="USD", auto_adjust=True, timezone="UTC"
+    )
 
     assert len(records) == 3
     assert records[0].ticker == "TEST"
@@ -26,7 +28,7 @@ def test_df_to_stockbase_simple_dataframe():
     assert records[0].previous_close is None
     assert records[1].previous_close == 105.0
     assert round(records[1].change or 0.0, 6) == 1.0
-    assert round(records[1].change_percent or 0.0, 6) == round((1.0/105.0)*100, 6)
+    assert round(records[1].change_percent or 0.0, 6) == round((1.0 / 105.0) * 100, 6)
     assert records[0].adjusted_close == 105.0  # auto_adjust=True -> adjusted_close=close
 
 
@@ -47,10 +49,11 @@ def test_df_to_stockbase_multiindex_dataframe():
     df = pd.DataFrame(data, index=dates)
     df.columns = pd.MultiIndex.from_tuples(df.columns, names=["Price", "Ticker"])
 
-    records = df_to_stockbase(df, ticker="AAA", name=None, market=None, currency="USD", auto_adjust=True, timezone="UTC")
+    records = df_to_stockbase(
+        df, ticker="AAA", name=None, market=None, currency="USD", auto_adjust=True, timezone="UTC"
+    )
 
     assert len(records) == 2
     assert records[0].open == 10.0
     assert records[0].close == 11.0
     assert records[0].volume == 100
-

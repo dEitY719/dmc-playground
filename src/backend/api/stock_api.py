@@ -1,10 +1,9 @@
+import yfinance as yf
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-import pandas as pd
-import yfinance as yf
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.backend.database import get_db
+from src.backend.database import get_db, reset_db
 from src.backend.models.stock import StockCreate, StockRead, StockUpdate
 from src.backend.services import stock_service
 
@@ -72,3 +71,9 @@ async def download_and_store(req: DownloadRequest, db: AsyncSession = Depends(ge
         timezone=req.timezone,
     )
     return {"saved": saved}
+
+
+@router.post("/reset", response_model=dict)
+async def reset_database() -> dict[str, bool]:
+    await reset_db()
+    return {"ok": True}

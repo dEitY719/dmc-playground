@@ -1,6 +1,7 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
 from httpx import AsyncClient
-from unittest.mock import patch, MagicMock
 
 
 @pytest.mark.asyncio
@@ -159,8 +160,8 @@ async def test_delete_stock(client: AsyncClient):
 @pytest.mark.asyncio
 @patch("yfinance.download")
 async def test_download_and_store_endpoint(mock_yf_download: MagicMock, client: AsyncClient):
+
     import pandas as pd
-    from datetime import datetime
 
     dates = pd.to_datetime(pd.date_range(start="2025-01-01", end="2025-01-03", freq="D"))
     df = pd.DataFrame(
@@ -183,7 +184,7 @@ async def test_download_and_store_endpoint(mock_yf_download: MagicMock, client: 
         "timezone": "UTC",
         "name": "Test",
         "market": "TESTX",
-        "currency": "USD"
+        "currency": "USD",
     }
 
     resp = await client.post("/stocks/download", json=payload)

@@ -88,13 +88,25 @@ async def delete_all_stocks(*, session: AsyncSession) -> int:
     return deleted_count
 
 
-async def upsert_stocks_from_dataframe(*, session: AsyncSession, df, ticker: str, name: str | None = None, market: str | None = None, currency: str = "USD", auto_adjust: bool = True, timezone: str = "UTC") -> int:
+async def upsert_stocks_from_dataframe(
+    *,
+    session: AsyncSession,
+    df,
+    ticker: str,
+    name: str | None = None,
+    market: str | None = None,
+    currency: str = "USD",
+    auto_adjust: bool = True,
+    timezone: str = "UTC",
+) -> int:
     """
     yfinance DataFrame을 받아 표준 모델로 변환 후 DB에 저장합니다.
     현재는 단순 add_all(insert)만 수행하고, 동일 키 중복 방지는 호출측에서 보장한다고 가정합니다.
     반환값은 저장된 레코드 수입니다.
     """
-    records = df_to_stockbase(df, ticker=ticker, name=name, market=market, currency=currency, auto_adjust=auto_adjust, timezone=timezone)
+    records = df_to_stockbase(
+        df, ticker=ticker, name=name, market=market, currency=currency, auto_adjust=auto_adjust, timezone=timezone
+    )
     for record in records:
         session.add(Stock.model_validate(record))
     await session.commit()

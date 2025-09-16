@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from typing import List
-from datetime import datetime
-
 import pandas as pd
 
 from src.backend.models.stock import StockBase
@@ -16,7 +13,7 @@ def df_to_stockbase(
     currency: str = "USD",
     auto_adjust: bool = True,
     timezone: str = "UTC",
-) -> List[StockBase]:
+) -> list[StockBase]:
     """
     yfinance.download() DataFrame을 StockBase 객체 리스트로 변환
 
@@ -60,7 +57,7 @@ def df_to_stockbase(
 
     df = df.rename(columns={k: v for k, v in column_map.items() if k in df.columns})
 
-    records: List[StockBase] = []
+    records: list[StockBase] = []
     previous_close: float | None = None
 
     for idx, row in df.iterrows():
@@ -112,5 +109,3 @@ def df_to_stockbase(
         previous_close = close_val if close_val is not None else previous_close
 
     return records
-
-
