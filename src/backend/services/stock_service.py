@@ -101,13 +101,36 @@ async def upsert_stocks_from_dataframe(
 ) -> int:
     """
     yfinance DataFrame을 받아 표준 모델로 변환 후 DB에 저장합니다.
-    현재는 단순 add_all(insert)만 수행하고, 동일 키 중복 방지는 호출측에서 보장한다고 가정합니다.
-    반환값은 저장된 레코드 수입니다.
+    중복(time, ticker) 레코드는 건너뛰고 신규 데이터만 저장합니다.
+    반환값은 저장된(신규) 레코드 수입니다.
     """
     records = df_to_stockbase(
         df, ticker=ticker, name=name, market=market, currency=currency, auto_adjust=auto_adjust, timezone=timezone
     )
+
+    if not records:
+        return 0
+
+    # 조회 범위를 좁히기 위해 변환된 레코드의 최소/최대 시간 계산
+    times = [r.time for r in records]
+    min_time = min(times)
+    max_time = max(times)
+
+    # 동일 ticker에 대해 [min_time, max_time] 구간의 기존 time들을 조회
+    from sqlalchemy import and_
+
+    existing = await session.execute(
+        select(Stock.time).where(and_(Stock.ticker == ticker, Stock.time >= min_time, Stock.time <= max_time))
+    )
+    existing_times = set(existing.scalars().all())
+
+    inserted = 0
     for record in records:
+        if record.time in existing_times:
+            continue
         session.add(Stock.model_validate(record))
-    await session.commit()
-    return len(records)
+        inserted += 1
+
+    if inserted:
+        await session.commit()
+    return inserted

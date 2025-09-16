@@ -160,7 +160,6 @@ async def test_delete_stock(client: AsyncClient):
 @pytest.mark.asyncio
 @patch("yfinance.download")
 async def test_download_and_store_endpoint(mock_yf_download: MagicMock, client: AsyncClient):
-
     import pandas as pd
 
     dates = pd.to_datetime(pd.date_range(start="2025-01-01", end="2025-01-03", freq="D"))
@@ -191,3 +190,10 @@ async def test_download_and_store_endpoint(mock_yf_download: MagicMock, client: 
     assert resp.status_code == 200
     body = resp.json()
     assert body.get("saved") == 3
+
+    # 같은 기간 재요청: 이미 저장된 3건이므로 신규 저장 수는 0이어야 함
+    mock_yf_download.return_value = df  # 동일 데이터 반환
+    resp2 = await client.post("/stocks/download", json=payload)
+    assert resp2.status_code == 200
+    body2 = resp2.json()
+    assert body2.get("saved") == 0

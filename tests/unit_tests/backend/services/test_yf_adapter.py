@@ -1,4 +1,3 @@
-
 import pandas as pd
 
 from src.backend.services.yf_adapter import df_to_stockbase
