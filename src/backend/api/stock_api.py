@@ -1,4 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+import pandas as pd
+import yfinance as yf
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.backend.database import get_db
@@ -40,3 +43,32 @@ async def delete_stock(stock_id: int, db: AsyncSession = Depends(get_db)) -> dic
     if not success:
         raise HTTPException(status_code=404, detail="Stock not found")
     return {"ok": True}
+
+
+class DownloadRequest(BaseModel):
+    ticker: str
+    start: str
+    end: str
+    auto_adjust: bool = True
+    timezone: str = "UTC"
+    name: str | None = None
+    market: str | None = None
+    currency: str = "USD"
+
+
+@router.post("/download", response_model=dict)
+async def download_and_store(req: DownloadRequest, db: AsyncSession = Depends(get_db)) -> dict[str, int]:
+    df = yf.download(req.ticker, start=req.start, end=req.end, auto_adjust=req.auto_adjust)
+    if df is None or len(df) == 0:
+        return {"saved": 0}
+    saved = await stock_service.upsert_stocks_from_dataframe(
+        session=db,
+        df=df,
+        ticker=req.ticker,
+        name=req.name,
+        market=req.market,
+        currency=req.currency,
+        auto_adjust=req.auto_adjust,
+        timezone=req.timezone,
+    )
+    return {"saved": saved}

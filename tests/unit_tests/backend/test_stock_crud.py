@@ -1,5 +1,6 @@
 import pytest
 from httpx import AsyncClient
+from unittest.mock import patch, MagicMock
 
 
 @pytest.mark.asyncio
@@ -153,3 +154,39 @@ async def test_delete_stock(client: AsyncClient):
 
     get_response = await client.get(f"/stocks/{stock_id}")
     assert get_response.status_code == 404
+
+
+@pytest.mark.asyncio
+@patch("yfinance.download")
+async def test_download_and_store_endpoint(mock_yf_download: MagicMock, client: AsyncClient):
+    import pandas as pd
+    from datetime import datetime
+
+    dates = pd.to_datetime(pd.date_range(start="2025-01-01", end="2025-01-03", freq="D"))
+    df = pd.DataFrame(
+        {
+            "Open": [1.0, 2.0, 3.0],
+            "High": [1.5, 2.5, 3.5],
+            "Low": [0.5, 1.5, 2.5],
+            "Close": [1.2, 2.2, 3.2],
+            "Volume": [100, 200, 300],
+        },
+        index=dates,
+    )
+    mock_yf_download.return_value = df
+
+    payload = {
+        "ticker": "TEST",
+        "start": "2025-01-01",
+        "end": "2025-01-04",
+        "auto_adjust": True,
+        "timezone": "UTC",
+        "name": "Test",
+        "market": "TESTX",
+        "currency": "USD"
+    }
+
+    resp = await client.post("/stocks/download", json=payload)
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body.get("saved") == 3
