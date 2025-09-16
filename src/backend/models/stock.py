@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from sqlalchemy import UniqueConstraint
 from sqlmodel import Column, DateTime, Field, SQLModel
 
 
@@ -46,6 +47,8 @@ class Stock(StockBase, table=True):
     """
     Represents a stock's price and volume information at a specific time in the database.
     """
+
+    __table_args__ = (UniqueConstraint("ticker", "time", name="uq_stock_ticker_time"),)
 
     id: int | None = Field(default=None, primary_key=True)
     created_at: datetime = Field(

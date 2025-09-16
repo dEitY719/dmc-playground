@@ -165,3 +165,26 @@ curl -X POST http://127.0.0.1:8000/stocks/reset
 ```
 
 초기화 후 2) 과정을 다시 시도하세요.
+
+### 4) 개발 중 자주 쓰는 명령어 (Quick commands)
+
+터미널에서 바로 호출할 수 있는 예시입니다.
+
+```bash
+# 스키마 초기화 (개발용)
+curl -s -X POST http://127.0.0.1:8000/stocks/reset
+
+# 지정 구간 데이터 다운로드 및 저장 (예시 티커/기간)
+curl -s -X POST http://127.0.0.1:8000/stocks/download \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "ticker":"069500.KS",
+        "start":"2024-02-01",
+        "end":"2024-03-05",
+        "auto_adjust":true,
+        "timezone":"Asia/Seoul",
+        "name":"KODEX 200",
+        "market":"KOSPI",
+        "currency":"KRW"
+      }'
+```
