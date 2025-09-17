@@ -20,19 +20,19 @@ async def create_stock(
     return await stock_service.create_stock(session=session, stock=stock)
 
 
-@stockbot_router.get("/stocks/{stock_id}", response_model=StockRead)
-async def read_stock(
+@stockbot_router.get("/stocks/{ticker}", response_model=list[StockRead])
+async def read_stocks_by_ticker(
     *,
     session: AsyncSession = Depends(get_db),
-    stock_id: int,
-) -> StockRead:
+    ticker: str,
+) -> list[StockRead]:
     """
-    Get a stock by ID.
+    Get stocks by ticker.
     """
-    db_stock = await stock_service.get_stock(session=session, stock_id=stock_id)
-    if not db_stock:
-        raise HTTPException(status_code=404, detail="Stock not found")
-    return StockRead.model_validate(db_stock)
+    db_stocks = await stock_service.get_stocks_by_ticker(session=session, ticker=ticker)
+    if not db_stocks:
+        raise HTTPException(status_code=404, detail="Stocks not found")
+    return db_stocks
 
 
 @stockbot_router.get("/stocks/", response_model=list[StockRead])

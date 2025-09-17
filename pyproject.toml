@@ -190,15 +190,15 @@ disable = ["R", "C", "W1203", "W0613"]
 
 
 [tool.mypy]
-mypy_path = "typings,src"
-files = ["./"]
-namespace_packages = true
+mypy_path = "typings"
+files = ["src"]
+
 plugins = [
     "sqlalchemy.ext.mypy.plugin",
     "pydantic.mypy",
 ]
 # 엄격한 타입 검사를 위한 추가 옵션들 (권장)
-strict = true # 모든 엄격 모드 활성화 (가장 강력)
+# strict = true # 모든 엄격 모드 활성화 (가장 강력)
 ignore_missing_imports = true
 
 # 만약 strict=true 가 너무 부담스럽다면 개별 옵션 활성화

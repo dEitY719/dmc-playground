@@ -53,7 +53,7 @@ mkdir -p frontend/components/charts/{area-chart,bar-chart,bubble-chart,composite
 # 기본 .py 파일 생성 및 예제 코드 삽입
 log_dim "[3/3] 기본 .py 파일 생성 및 예제 코드를 삽입합니다."
 touch frontend/components/theming/__init__.py
-cat << EOF > frontend/components/theming/theme_provider.py
+cat <<EOF >frontend/components/theming/theme_provider.py
 import dash_mantine_components as dmc
 
 def ThemeProviderExample():
@@ -61,7 +61,7 @@ def ThemeProviderExample():
 EOF
 
 touch frontend/components/layout/__init__.py
-cat << EOF > frontend/components/layout/app_shell.py
+cat <<EOF >frontend/components/layout/app_shell.py
 import dash_mantine_components as dmc
 
 def AppShellExample():
@@ -69,7 +69,7 @@ def AppShellExample():
 EOF
 
 touch frontend/components/inputs/__init__.py
-cat << EOF > frontend/components/inputs/text_input.py
+cat <<EOF >frontend/components/inputs/text_input.py
 import dash_mantine_components as dmc
 
 def TextInputExample():
@@ -77,7 +77,7 @@ def TextInputExample():
 EOF
 
 touch frontend/components/combobox/__init__.py
-cat << EOF > frontend/components/combobox/select_box.py
+cat <<EOF >frontend/components/combobox/select_box.py
 import dash_mantine_components as dmc
 
 def SelectBoxExample():
@@ -85,7 +85,7 @@ def SelectBoxExample():
 EOF
 
 touch frontend/components/buttons/__init__.py
-cat << EOF > frontend/components/buttons/custom_button.py
+cat <<EOF >frontend/components/buttons/custom_button.py
 import dash_mantine_components as dmc
 
 def CustomButtonExample():
@@ -93,7 +93,7 @@ def CustomButtonExample():
 EOF
 
 touch frontend/components/navigation/__init__.py
-cat << EOF > frontend/components/navigation/sidebar.py
+cat <<EOF >frontend/components/navigation/sidebar.py
 import dash_mantine_components as dmc
 
 def SidebarExample():
@@ -101,7 +101,7 @@ def SidebarExample():
 EOF
 
 touch frontend/components/feedback/__init__.py
-cat << EOF > frontend/components/feedback/notification_banner.py
+cat <<EOF >frontend/components/feedback/notification_banner.py
 import dash_mantine_components as dmc
 
 def NotificationBannerExample():
@@ -109,7 +109,7 @@ def NotificationBannerExample():
 EOF
 
 touch frontend/components/overlay/__init__.py
-cat << EOF > frontend/components/overlay/modal.py
+cat <<EOF >frontend/components/overlay/modal.py
 import dash_mantine_components as dmc
 
 def ModalExample():
@@ -117,7 +117,7 @@ def ModalExample():
 EOF
 
 touch frontend/components/data-display/__init__.py
-cat << EOF > frontend/components/data-display/custom_table.py
+cat <<EOF >frontend/components/data-display/custom_table.py
 import dash_mantine_components as dmc
 
 def CustomTableExample():
@@ -125,7 +125,7 @@ def CustomTableExample():
 EOF
 
 touch frontend/components/typography/__init__.py
-cat << EOF > frontend/components/typography/title_text.py
+cat <<EOF >frontend/components/typography/title_text.py
 import dash_mantine_components as dmc
 
 def TitleTextExample():
@@ -133,7 +133,7 @@ def TitleTextExample():
 EOF
 
 touch frontend/components/miscellaneous/__init__.py
-cat << EOF > frontend/components/miscellaneous/color_swatch.py
+cat <<EOF >frontend/components/miscellaneous/color_swatch.py
 import dash_mantine_components as dmc
 
 def ColorSwatchExample():
@@ -141,7 +141,7 @@ def ColorSwatchExample():
 EOF
 
 touch frontend/components/date-pickers/__init__.py
-cat << EOF > frontend/components/date-pickers/date_picker.py
+cat <<EOF >frontend/components/date-pickers/date_picker.py
 import dash_mantine_components as dmc
 
 def DatePickerExample():
@@ -149,14 +149,14 @@ def DatePickerExample():
 EOF
 
 touch frontend/components/charts/__init__.py
-cat << EOF > frontend/components/charts/bar_chart.py
+cat <<EOF >frontend/components/charts/bar_chart.py
 import dash_mantine_components as dmc
 
 def BarChartExample():
     return dmc.Text('BarChart 예시')
 EOF
 
-cat << EOF > frontend/app.py
+cat <<EOF >frontend/app.py
 import dash
 import dash_mantine_components as dmc
 from dash import html
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     app.run_server(debug=True)
 EOF
 
-cat << EOF > frontend/index.py
+cat <<EOF >frontend/index.py
 # index.py - 엔트리 포인트 예시
 from .app import app
 
@@ -182,7 +182,7 @@ if __name__ == "__main__":
     app.run_server(debug=True)
 EOF
 
-cat << EOF > frontend/config/settings.py
+cat <<EOF >frontend/config/settings.py
 # 환경설정 예시
 DEBUG = True
 EOF
@@ -193,7 +193,7 @@ touch frontend/assets/css/.gitkeep
 mkdir -p frontend/assets/js
 mkdir -p frontend/assets/images
 
-cat << EOF > frontend/pages/home/layout.py
+cat <<EOF >frontend/pages/home/layout.py
 import dash_mantine_components as dmc
 
 def HomeLayout():
@@ -208,7 +208,7 @@ touch frontend/pages/home/__init__.py
 
 touch frontend/pages/home/callbacks.py
 
-cat << EOF > frontend/pages/dashboard/layout.py
+cat <<EOF >frontend/pages/dashboard/layout.py
 import dash_mantine_components as dmc
 
 def DashboardLayout():
@@ -223,7 +223,7 @@ touch frontend/pages/dashboard/__init__.py
 
 touch frontend/pages/dashboard/callbacks.py
 
-cat << EOF > frontend/themes/main_theme.py
+cat <<EOF >frontend/themes/main_theme.py
 # DMC 테마 예시
 theme = {
     "primaryColor": "blue",
@@ -233,13 +233,13 @@ EOF
 
 touch frontend/themes/__init__.py
 
-cat << EOF > frontend/utils/data_utils.py
+cat <<EOF >frontend/utils/data_utils.py
 # 데이터 유틸리티 예시
 def get_data():
     return [1, 2, 3]
 EOF
 
-cat << EOF > frontend/utils/validation_utils.py
+cat <<EOF >frontend/utils/validation_utils.py
 # 검증 유틸리티 예시
 def is_valid(x):
     return x is not None
@@ -247,7 +247,7 @@ EOF
 
 touch frontend/utils/__init__.py
 
-cat << EOF > frontend/services/data_service.py
+cat <<EOF >frontend/services/data_service.py
 # 데이터 서비스 예시
 def fetch_data():
     return {"result": "ok"}
@@ -255,7 +255,7 @@ EOF
 
 touch frontend/services/__init__.py
 
-cat << EOF > frontend/requirements.txt
+cat <<EOF >frontend/requirements.txt
 dash
 dash-mantine-components
 EOF
@@ -270,4 +270,4 @@ touch frontend/pyproject.toml
 
 touch frontend/README.md
 
-log_info "완료! 현재 디렉토리 하위에 DMC 폴더 구조가 생성되었습니다." 
+log_info "완료! 현재 디렉토리 하위에 DMC 폴더 구조가 생성되었습니다."

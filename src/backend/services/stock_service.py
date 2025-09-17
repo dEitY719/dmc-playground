@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from sqlalchemy import and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
@@ -24,6 +25,14 @@ async def get_stock(*, session: AsyncSession, stock_id: int) -> Stock | None:
     """
     result = await session.execute(select(Stock).where(Stock.id == stock_id))
     return result.scalar_one_or_none()
+
+
+async def get_stocks_by_ticker(*, session: AsyncSession, ticker: str) -> list[StockRead]:
+    """
+    Retrieves all stock entries for a given ticker.
+    """
+    result = await session.execute(select(Stock).where(Stock.ticker == ticker))
+    return [StockRead.model_validate(stock) for stock in result.scalars().all()]
 
 
 async def get_all_stocks(*, session: AsyncSession) -> list[StockRead]:
@@ -117,7 +126,6 @@ async def upsert_stocks_from_dataframe(
     max_time = max(times)
 
     # 동일 ticker에 대해 [min_time, max_time] 구간의 기존 time들을 조회
-    from sqlalchemy import and_
 
     existing = await session.execute(
         select(Stock.time).where(and_(Stock.ticker == ticker, Stock.time >= min_time, Stock.time <= max_time))

@@ -52,11 +52,51 @@ async def test_read_stock(client: AsyncClient):
     created_stock = create_response.json()
     stock_id = created_stock["id"]
 
-    response = await client.get(f"/stocks/{stock_id}")
+    response = await client.get(f"/stocks/id/{stock_id}")
     assert response.status_code == 200
     data = response.json()
     assert data["ticker"] == stock_data["ticker"]
     assert data["id"] == stock_id
+
+
+@pytest.mark.asyncio
+async def test_read_stocks_by_ticker(client: AsyncClient):
+    """
+    Test case for reading multiple stock entries by ticker.
+    """
+    ticker = "TEST_TICKER"
+    stock_data_1 = {
+        "ticker": ticker,
+        "market": "NASDAQ",
+        "currency": "USD",
+        "time": "2025-08-13T10:00:00Z",
+        "open": 100.0,
+        "high": 101.0,
+        "low": 99.0,
+        "close": 100.5,
+        "volume": 100000,
+    }
+    stock_data_2 = {
+        "ticker": ticker,
+        "market": "NASDAQ",
+        "currency": "USD",
+        "time": "2025-08-13T11:00:00Z",
+        "open": 100.5,
+        "high": 102.0,
+        "low": 100.0,
+        "close": 101.5,
+        "volume": 120000,
+    }
+    await client.post("/stocks/", json=stock_data_1)
+    await client.post("/stocks/", json=stock_data_2)
+
+    response = await client.get(f"/stocks/{ticker}")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 2
+    assert data[0]["ticker"] == ticker
+    assert data[1]["ticker"] == ticker
 
 
 @pytest.mark.asyncio
