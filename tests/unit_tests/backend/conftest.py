@@ -1,5 +1,6 @@
+from collections.abc import AsyncGenerator
+
 import pytest_asyncio
-from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -29,7 +30,7 @@ def event_loop():
 
 
 @pytest_asyncio.fixture(scope="session")
-async def create_test_engine_fixture() -> AsyncEngine:
+async def create_test_engine_fixture() -> AsyncGenerator[AsyncEngine, None]:
     """
     Create a test database engine.
     Using NullPool to prevent connection issues across test functions.
@@ -40,7 +41,7 @@ async def create_test_engine_fixture() -> AsyncEngine:
 
 
 @pytest_asyncio.fixture(scope="function")
-async def get_test_db_session(create_test_engine_fixture: AsyncEngine) -> AsyncSession:
+async def get_test_db_session(create_test_engine_fixture: AsyncEngine) -> AsyncGenerator[AsyncSession, None]:
     """
     Create a new database session for each test function.
     This fixture ensures that each test runs in isolation by creating and dropping tables for each test.
@@ -61,19 +62,20 @@ async def get_test_db_session(create_test_engine_fixture: AsyncEngine) -> AsyncS
 
 
 @pytest_asyncio.fixture(scope="function")
-async def client(get_test_db_session: AsyncSession) -> AsyncClient:
+async def client(get_test_db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     """
     Create a new FastAPI test client for each test function.
     This client uses the isolated database session provided by the `get_test_db_session` fixture.
     """
-    app = FastAPI()
-    app.include_router(main_app.router)
 
     def get_session_override() -> AsyncSession:
         return get_test_db_session
 
-    app.dependency_overrides[get_db] = get_session_override
+    main_app.dependency_overrides[get_db] = get_session_override
 
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(app=main_app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
+
+    # Clean up the override after the test
+    main_app.dependency_overrides.clear()

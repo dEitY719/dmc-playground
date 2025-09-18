@@ -1,18 +1,83 @@
+"""
+Stock models for database and API communication.
+"""
+
 from datetime import datetime, timezone
 
-from sqlalchemy import UniqueConstraint
-from sqlmodel import Column, DateTime, Field, SQLModel
+from sqlalchemy import Column, DateTime, UniqueConstraint
+from sqlmodel import Field, Relationship, SQLModel
 
 
-class StockBase(SQLModel):
+# -----------------
+# StockInfo Models
+# -----------------
+class StockInfoBase(SQLModel):
     """
-    Base model for stock data, containing all common fields.
+    Base model for stock metadata.
     """
 
-    ticker: str = Field(index=True)
+    ticker: str = Field(unique=True, index=True)
     name: str | None = Field(default=None, index=True)
     market: str | None = Field(default=None, index=True)
     currency: str | None = Field(default="USD")
+
+
+class StockInfo(StockInfoBase, table=True):
+    """
+    Database model for stock metadata.
+    """
+
+    __tablename__ = "stockinfo"
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+        default_factory=lambda: datetime.now(timezone.utc),
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+        default_factory=lambda: datetime.now(timezone.utc),
+    )
+
+    prices: list["StockPrice"] = Relationship(back_populates="stock_info")
+
+
+class StockInfoCreate(StockInfoBase):
+    """
+    Model for creating a new stock info entry.
+    """
+
+    pass
+
+
+class StockInfoUpdate(SQLModel):
+    """
+    Model for updating a stock info entry.
+    """
+
+    name: str | None = None
+    market: str | None = None
+    currency: str | None = None
+
+
+class StockInfoRead(StockInfoBase):
+    """
+    Model for reading stock info from the API.
+    """
+
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+
+# -----------------
+# StockPrice Models
+# -----------------
+class StockPriceBase(SQLModel):
+    """
+    Base model for stock price data.
+    """
+
     time: datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False, index=True))
     open: float
     high: float
@@ -25,32 +90,16 @@ class StockBase(SQLModel):
     volume: int
 
 
-class StockCreate(StockBase):
+class StockPrice(StockPriceBase, table=True):
     """
-    Model for creating a new stock entry.
-    """
-
-    pass
-
-
-class StockRead(StockBase):
-    """
-    Model for reading stock data from the API.
+    Database model for stock price data.
     """
 
-    id: int
-    created_at: datetime
-    updated_at: datetime
-
-
-class Stock(StockBase, table=True):
-    """
-    Represents a stock's price and volume information at a specific time in the database.
-    """
-
-    __table_args__ = (UniqueConstraint("ticker", "time", name="uq_stock_ticker_time"),)
+    __tablename__ = "stockprice"
+    __table_args__ = (UniqueConstraint("stock_info_id", "time", name="uq_stock_price_stock_info_id_time"),)
 
     id: int | None = Field(default=None, primary_key=True)
+    stock_info_id: int = Field(foreign_key="stockinfo.id", index=True)
     created_at: datetime = Field(
         sa_column=Column(DateTime(timezone=True), nullable=False),
         default_factory=lambda: datetime.now(timezone.utc),
@@ -60,19 +109,34 @@ class Stock(StockBase, table=True):
         default_factory=lambda: datetime.now(timezone.utc),
     )
 
+    stock_info: StockInfo = Relationship(back_populates="prices")
 
-class StockUpdate(SQLModel):
+
+class StockPriceCreate(StockPriceBase):
     """
-    Model for updating a stock entry. All fields are optional.
+    Model for creating a new stock price entry.
     """
 
-    name: str | None = None
-    market: str | None = None
-    currency: str | None = None
-    time: datetime | None = None
-    open: float | None = None
-    high: float | None = None
-    low: float | None = None
-    close: float | None = None
-    adjusted_close: float | None = None
-    volume: int | None = None
+    stock_info_id: int
+
+
+class StockPriceRead(StockPriceBase):
+    """
+    Model for reading stock price data from the API.
+    """
+
+    id: int
+    stock_info_id: int
+    created_at: datetime
+    updated_at: datetime
+
+
+# -----------------
+# Combined Read Models for API
+# -----------------
+class StockInfoReadWithPrices(StockInfoRead):
+    """
+    Model for reading stock info along with its associated prices.
+    """
+
+    prices: list[StockPriceRead] = []

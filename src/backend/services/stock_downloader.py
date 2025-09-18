@@ -1,6 +1,6 @@
 # src/backend/services/stock_downloader.py
 import json
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -89,7 +89,7 @@ class StockDownloader:
 
         return data
 
-    def _get_effective_start_date(self, ticker: str, requested_start_date: str) -> datetime.date:
+    def _get_effective_start_date(self, ticker: str, requested_start_date: str) -> date:
         """
         메타데이터를 기반으로 실제 다운로드를 시작할 날짜를 결정합니다.
 
@@ -105,5 +105,5 @@ class StockDownloader:
             last_download_date = datetime.strptime(last_download_date_str, "%Y-%m-%d").date()
             # 마지막으로 받은 날짜의 다음 날부터 다운로드 시작
             return last_download_date + timedelta(days=1)
-        else:
-            return datetime.strptime(requested_start_date, "%Y-%m-%d").date()
+
+        return datetime.strptime(requested_start_date, "%Y-%m-%d").date()
