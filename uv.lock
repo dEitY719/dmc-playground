@@ -450,6 +450,7 @@ dev = [
     { name = "pytest-mock" },
     { name = "ruff" },
     { name = "tox" },
+    { name = "types-pytz" },
     { name = "types-pyyaml" },
     { name = "types-requests" },
     { name = "types-toml" },
@@ -555,6 +556,7 @@ requires-dist = [
     { name = "tomlkit", specifier = "==0.13.3" },
     { name = "tox", specifier = "==4.27.0" },
     { name = "tox", marker = "extra == 'dev'" },
+    { name = "types-pytz", marker = "extra == 'dev'" },
     { name = "types-pyyaml", specifier = "==6.0.12.20250516" },
     { name = "types-pyyaml", marker = "extra == 'dev'" },
     { name = "types-requests", specifier = "==2.32.4.20250611" },
@@ -1556,6 +1558,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a5/b7/19c01717747076f63c54d871ada081cd711a7c9a7572f2225675c3858b94/tox-4.27.0.tar.gz", hash = "sha256:b97d5ecc0c0d5755bcc5348387fef793e1bfa68eb33746412f4c60881d7f5f57", size = 198351, upload-time = "2025-06-17T15:17:50.585Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c1/3a/30889167f41ecaffb957ec4409e1cbc1d5d558a5bbbdfb734a5b9911930f/tox-4.27.0-py3-none-any.whl", hash = "sha256:2b8a7fb986b82aa2c830c0615082a490d134e0626dbc9189986da46a313c4f20", size = 173441, upload-time = "2025-06-17T15:17:48.689Z" },
+]
+
+[[package]]
+name = "types-pytz"
+version = "2025.2.0.20250809"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/07/e2/c774f754de26848f53f05defff5bb21dd9375a059d1ba5b5ea943cf8206e/types_pytz-2025.2.0.20250809.tar.gz", hash = "sha256:222e32e6a29bb28871f8834e8785e3801f2dc4441c715cd2082b271eecbe21e5", size = 10876, upload-time = "2025-08-09T03:14:17.453Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/db/d0/91c24fe54e565f2344d7a6821e6c6bb099841ef09007ea6321a0bac0f808/types_pytz-2025.2.0.20250809-py3-none-any.whl", hash = "sha256:4f55ed1b43e925cf851a756fe1707e0f5deeb1976e15bf844bcaa025e8fbd0db", size = 10095, upload-time = "2025-08-09T03:14:16.674Z" },
 ]
 
 [[package]]

@@ -53,11 +53,10 @@ def test_download_scenarios(mock_yf_download: MagicMock, tmp_metadata_file: Path
 
     # 다운로드된 데이터 검증
     assert soxl_data_1 is not None
-    assert soxl_data_1.index.min() == pd.to_datetime("2025-01-01")
-    assert soxl_data_1.index.max() == pd.to_datetime("2025-08-14")
+    assert soxl_data_1.index.min() == pd.to_datetime("2025-01-01").tz_localize("UTC")
+    assert soxl_data_1.index.max() == pd.to_datetime("2025-08-14").tz_localize("UTC")
     assert aapl_data_1 is not None
-    assert aapl_data_1.index.max() == pd.to_datetime("2025-07-14")
-
+    assert aapl_data_1.index.max() == pd.to_datetime("2025-07-14").tz_localize("UTC")
     # yf.download 호출 인수 검증
     mock_yf_download.assert_any_call("SOXL", start="2025-01-01", end="2025-08-16", auto_adjust=True)
     mock_yf_download.assert_any_call("AAPL", start="2025-01-01", end="2025-07-16", auto_adjust=True)
@@ -81,10 +80,10 @@ def test_download_scenarios(mock_yf_download: MagicMock, tmp_metadata_file: Path
 
     # 다운로드된 데이터 검증 (새로운 데이터만 있어야 함)
     assert soxl_data_2 is not None
-    assert soxl_data_2.index.min() == pd.to_datetime("2025-08-15")
-    assert soxl_data_2.index.max() == pd.to_datetime("2025-08-22")
+    assert soxl_data_2.index.min() == pd.to_datetime("2025-08-15").tz_localize("UTC")
+    assert soxl_data_2.index.max() == pd.to_datetime("2025-08-22").tz_localize("UTC")
     assert aapl_data_2 is not None
-    assert aapl_data_2.index.min() == pd.to_datetime("2025-07-15")
+    assert aapl_data_2.index.min() == pd.to_datetime("2025-07-15").tz_localize("UTC")
 
     # yf.download 호출 인수 검증 (시작 날짜가 업데이트되었는지 확인)
     mock_yf_download.assert_any_call("SOXL", start="2025-08-15", end="2025-08-24", auto_adjust=True)

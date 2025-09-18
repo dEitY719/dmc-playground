@@ -3,6 +3,7 @@ Service layer for stock-related business logic.
 """
 
 from datetime import datetime, timezone
+from typing import Any, cast
 
 import pandas as pd
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,7 +40,7 @@ async def get_stock_info(*, session: AsyncSession, stock_info_id: int) -> StockI
     Retrieves a stock info entry by its ID with all its prices, using eager loading.
     """
     result = await session.execute(
-        select(StockInfo).where(StockInfo.id == stock_info_id).options(selectinload(StockInfo.prices))
+        select(StockInfo).where(StockInfo.id == stock_info_id).options(selectinload(cast(Any, StockInfo.prices)))
     )
     stock_info = result.scalar_one_or_none()
     if not stock_info:
@@ -52,7 +53,7 @@ async def get_stock_info_by_ticker(*, session: AsyncSession, ticker: str) -> Sto
     Retrieves a stock info entry by its ticker with all its prices, using eager loading.
     """
     result = await session.execute(
-        select(StockInfo).where(StockInfo.ticker == ticker).options(selectinload(StockInfo.prices))
+        select(StockInfo).where(StockInfo.ticker == ticker).options(selectinload(cast(Any, StockInfo.prices)))
     )
     stock_info = result.scalar_one_or_none()
     if not stock_info:

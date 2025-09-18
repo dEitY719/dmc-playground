@@ -81,6 +81,12 @@ class StockDownloader:
             print(f"[{ticker}] No data found for the given period.")
             return None
 
+        # Convert timezone-aware index to a specific timezone
+        if data.index.tz is not None:
+            data.index = data.index.tz_convert("UTC")
+        else:
+            data.index = data.index.tz_localize("UTC")
+
         # 다운로드 성공 시 메타데이터 업데이트
         last_date_in_data = data.index[-1].strftime("%Y-%m-%d")
         self.ticker_metadata[ticker] = last_date_in_data
