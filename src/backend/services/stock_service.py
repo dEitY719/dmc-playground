@@ -10,13 +10,25 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
+from src.backend.models.holding import (
+    StockHoldingDetail,
+    StockHoldingDetailCreate,
+    StockHoldingDetailRead,
+    StockHoldingDetailUpdate,
+)
+from src.backend.models.price import StockPrice
 from src.backend.models.stock import (
     StockInfo,
     StockInfoCreate,
     StockInfoRead,
     StockInfoReadWithPrices,
     StockInfoUpdate,
-    StockPrice,
+)
+from src.backend.models.transaction import (
+    StockTransaction,
+    StockTransactionCreate,
+    StockTransactionRead,
+    StockTransactionUpdate,
 )
 from src.backend.services.yf_adapter import df_to_stockbase
 
@@ -67,6 +79,79 @@ async def get_all_stock_infos(*, session: AsyncSession) -> list[StockInfoRead]:
     """
     result = await session.execute(select(StockInfo))
     return [StockInfoRead.model_validate(stock) for stock in result.scalars().all()]
+
+
+# ----------------------------
+# StockTransaction Service Functions
+# ----------------------------
+async def create_stock_transaction(
+    *, session: AsyncSession, transaction: StockTransactionCreate
+) -> StockTransactionRead:
+    """
+    Creates a new stock transaction entry.
+    """
+    db_transaction = StockTransaction.model_validate(transaction)
+    session.add(db_transaction)
+    await session.commit()
+    await session.refresh(db_transaction)
+    return db_transaction
+
+
+async def get_stock_transaction(*, session: AsyncSession, transaction_id: int) -> StockTransactionRead | None:
+    """
+    Retrieves a stock transaction entry by its ID.
+    """
+    result = await session.execute(select(StockTransaction).where(StockTransaction.id == transaction_id))
+    transaction = result.scalar_one_or_none()
+    if not transaction:
+        return None
+    return transaction
+
+
+async def get_user_stock_transactions(*, session: AsyncSession, user_id: int) -> list[StockTransactionRead]:
+    """
+    Retrieves all stock transaction entries for a specific user.
+    """
+    result = await session.execute(select(StockTransaction).where(StockTransaction.user_id == user_id))
+    return [StockTransactionRead.model_validate(t) for t in result.scalars().all()]
+
+
+async def update_stock_transaction(
+    *, session: AsyncSession, transaction_id: int, transaction_update: StockTransactionUpdate
+) -> StockTransactionRead | None:
+    """
+    Updates an existing stock transaction entry.
+    """
+    result = await session.execute(select(StockTransaction).where(StockTransaction.id == transaction_id))
+    db_transaction = result.scalar_one_or_none()
+
+    if not db_transaction:
+        return None
+
+    update_data = transaction_update.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_transaction, key, value)
+
+    db_transaction.updated_at = datetime.now(timezone.utc)
+    session.add(db_transaction)
+    await session.commit()
+    await session.refresh(db_transaction)
+    return db_transaction
+
+
+async def delete_stock_transaction(*, session: AsyncSession, transaction_id: int) -> bool:
+    """
+    Deletes a stock transaction entry.
+    """
+    result = await session.execute(select(StockTransaction).where(StockTransaction.id == transaction_id))
+    db_transaction = result.scalar_one_or_none()
+
+    if not db_transaction:
+        return False
+
+    await session.delete(db_transaction)
+    await session.commit()
+    return True
 
 
 async def update_stock_info(
@@ -169,3 +254,91 @@ async def upsert_stocks_from_dataframe(
         await session.commit()
 
     return inserted_count
+
+
+# ----------------------------
+# StockHoldingDetail Service Functions
+# ----------------------------
+async def create_stock_holding_detail(
+    *, session: AsyncSession, holding_detail: StockHoldingDetailCreate
+) -> StockHoldingDetailRead:
+    """
+    Creates a new stock holding detail entry.
+    """
+    db_holding_detail = StockHoldingDetail.model_validate(holding_detail)
+    session.add(db_holding_detail)
+    await session.commit()
+    await session.refresh(db_holding_detail)
+    return db_holding_detail
+
+
+async def get_stock_holding_detail(*, session: AsyncSession, holding_id: int) -> StockHoldingDetailRead | None:
+    """
+    Retrieves a stock holding detail entry by its ID.
+    """
+    result = await session.execute(select(StockHoldingDetail).where(StockHoldingDetail.id == holding_id))
+    holding_detail = result.scalar_one_or_none()
+    if not holding_detail:
+        return None
+    return holding_detail
+
+
+async def get_user_stock_holding_details(*, session: AsyncSession, user_id: int) -> list[StockHoldingDetailRead]:
+    """
+    Retrieves all stock holding detail entries for a specific user.
+    """
+    result = await session.execute(select(StockHoldingDetail).where(StockHoldingDetail.user_id == user_id))
+    return [StockHoldingDetailRead.model_validate(h) for h in result.scalars().all()]
+
+
+async def get_user_stock_holding_detail_by_ticker(
+    *, session: AsyncSession, user_id: int, ticker: str
+) -> StockHoldingDetailRead | None:
+    """
+    Retrieves a stock holding detail entry for a specific user and ticker.
+    """
+    result = await session.execute(
+        select(StockHoldingDetail).where(StockHoldingDetail.user_id == user_id, StockHoldingDetail.ticker == ticker)
+    )
+    holding_detail = result.scalar_one_or_none()
+    if not holding_detail:
+        return None
+    return holding_detail
+
+
+async def update_stock_holding_detail(
+    *, session: AsyncSession, holding_id: int, holding_detail_update: StockHoldingDetailUpdate
+) -> StockHoldingDetailRead | None:
+    """
+    Updates an existing stock holding detail entry.
+    """
+    result = await session.execute(select(StockHoldingDetail).where(StockHoldingDetail.id == holding_id))
+    db_holding_detail = result.scalar_one_or_none()
+
+    if not db_holding_detail:
+        return None
+
+    update_data = holding_detail_update.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_holding_detail, key, value)
+
+    db_holding_detail.updated_at = datetime.now(timezone.utc)
+    session.add(db_holding_detail)
+    await session.commit()
+    await session.refresh(db_holding_detail)
+    return db_holding_detail
+
+
+async def delete_stock_holding_detail(*, session: AsyncSession, holding_id: int) -> bool:
+    """
+    Deletes a stock holding detail entry.
+    """
+    result = await session.execute(select(StockHoldingDetail).where(StockHoldingDetail.id == holding_id))
+    db_holding_detail = result.scalar_one_or_none()
+
+    if not db_holding_detail:
+        return False
+
+    await session.delete(db_holding_detail)
+    await session.commit()
+    return True
