@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 import pytz
 
-from src.backend.models.stock import StockInfoBase, StockPriceBase
+from src.backend.models.price import StockPriceBase
+from src.backend.models.stock import StockInfoBase
 
 
 class StockData(StockInfoBase, StockPriceBase):
@@ -39,7 +40,7 @@ def df_to_stockbase(
     # --- Step 2: Handle MultiIndex columns ---
     if isinstance(df_reset.columns, pd.MultiIndex):
         # yfinance 경우 (field, ticker) 또는 (ticker, field) 구조가 있음
-        level0, level1 = df_reset.columns.levels[0], df_reset.columns.levels[1]
+        level0 = df_reset.columns.levels[0]
 
         if "Close" in level0 or "Adj Close" in level0:
             # (field, ticker) 구조
