@@ -94,6 +94,15 @@ async def create_stock_transaction(
     session.add(db_transaction)
     await session.commit()
     await session.refresh(db_transaction)
+
+    # Update StockHoldingDetail based on the new transaction
+    await _update_stock_holding_detail(
+        session=session,
+        user_id=db_transaction.user_id,
+        stock_info_id=db_transaction.stock_info_id,
+        ticker=db_transaction.ticker,
+    )
+
     return db_transaction
 
 
@@ -136,6 +145,15 @@ async def update_stock_transaction(
     session.add(db_transaction)
     await session.commit()
     await session.refresh(db_transaction)
+
+    # Update StockHoldingDetail after transaction update
+    await _update_stock_holding_detail(
+        session=session,
+        user_id=db_transaction.user_id,
+        stock_info_id=db_transaction.stock_info_id,
+        ticker=db_transaction.ticker,
+    )
+
     return db_transaction
 
 
@@ -151,6 +169,15 @@ async def delete_stock_transaction(*, session: AsyncSession, transaction_id: int
 
     await session.delete(db_transaction)
     await session.commit()
+
+    # Update StockHoldingDetail after transaction deletion
+    await _update_stock_holding_detail(
+        session=session,
+        user_id=db_transaction.user_id,
+        stock_info_id=db_transaction.stock_info_id,
+        ticker=db_transaction.ticker,
+    )
+
     return True
 
 
@@ -289,6 +316,70 @@ async def get_user_stock_holding_details(*, session: AsyncSession, user_id: int)
     """
     result = await session.execute(select(StockHoldingDetail).where(StockHoldingDetail.user_id == user_id))
     return [StockHoldingDetailRead.model_validate(h) for h in result.scalars().all()]
+
+
+async def _update_stock_holding_detail(*, session: AsyncSession, user_id: int, stock_info_id: int, ticker: str) -> None:
+    """
+    Calculates and updates the StockHoldingDetail for a given user and stock based on all transactions.
+    """
+    # 1. Get all transactions for the user and stock
+    result = await session.execute(
+        select(StockTransaction).where(
+            StockTransaction.user_id == user_id, StockTransaction.stock_info_id == stock_info_id
+        )
+    )
+    transactions = result.scalars().all()
+
+    # 2. Calculate holding quantity, total buy amount, and average buy price
+    holding_quantity = 0
+    total_buy_amount = 0.0
+
+    for t in transactions:
+        if t.transaction_type == "매수":
+            holding_quantity += t.quantity
+            total_buy_amount += t.total_amount
+        elif t.transaction_type == "매도":
+            holding_quantity -= t.quantity
+            total_buy_amount -= t.total_amount  # Adjust total_buy_amount for sales
+
+    average_buy_price = total_buy_amount / holding_quantity if holding_quantity > 0 else 0.0
+
+    # 3. Get or create StockHoldingDetail
+    result = await session.execute(
+        select(StockHoldingDetail).where(
+            StockHoldingDetail.user_id == user_id, StockHoldingDetail.stock_info_id == stock_info_id
+        )
+    )
+    db_holding_detail = result.scalar_one_or_none()
+
+    if holding_quantity <= 0:
+        if db_holding_detail:
+            await session.delete(db_holding_detail)
+            await session.commit()
+        return
+
+    if db_holding_detail:
+        # Update existing
+        db_holding_detail.holding_quantity = holding_quantity
+        db_holding_detail.average_buy_price = average_buy_price
+        db_holding_detail.total_buy_amount = total_buy_amount
+        db_holding_detail.updated_at = datetime.now(timezone.utc)
+        session.add(db_holding_detail)
+    else:
+        # Create new
+        new_holding_detail = StockHoldingDetailCreate(
+            user_id=user_id,
+            stock_info_id=stock_info_id,
+            ticker=ticker,
+            holding_quantity=holding_quantity,
+            average_buy_price=average_buy_price,
+            total_buy_amount=total_buy_amount,
+        )
+        db_holding_detail = StockHoldingDetail.model_validate(new_holding_detail)
+        session.add(db_holding_detail)
+
+    await session.commit()
+    await session.refresh(db_holding_detail)
 
 
 async def get_user_stock_holding_detail_by_ticker(
